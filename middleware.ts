@@ -3,7 +3,6 @@ import { NextRequest } from "next/server";
 
 import { LocaleSupport } from "./enums";
 
-// This function can be marked `async` if using `await` inside
 export function middleware(request: NextRequest) {
   const url = request.nextUrl;
   const pathname = url.pathname;
@@ -12,29 +11,94 @@ export function middleware(request: NextRequest) {
   const SUPPORTED_LOCALES = [LocaleSupport.EN, LocaleSupport.VI];
   const DEFAULT_LOCALE = LocaleSupport.EN;
 
-  // Check if the user accessed only the domain (e.g., example.com → redirect to /home)
+  // Helper function to get preferred locale
+  function getPreferredLocale(): LocaleSupport {
+    // 1. Check for saved locale in cookies
+    const cookies = request.cookies;
+    const savedLocale = cookies.get("NEXT_LOCALE")?.value;
+    if (savedLocale && SUPPORTED_LOCALES.includes(savedLocale as LocaleSupport)) {
+      return savedLocale as LocaleSupport;
+    }
+
+    // 2. Check Accept-Language header
+    const acceptLanguage = request.headers.get("Accept-Language");
+    if (acceptLanguage) {
+      const browserLocales = acceptLanguage
+        .split(",")
+        .map(lang => lang.split(";")[0].trim().toLowerCase());
+      
+      for (const browserLocale of browserLocales) {
+        // Check for exact match (e.g., "en" or "vi")
+        if (SUPPORTED_LOCALES.includes(browserLocale as LocaleSupport)) {
+          return browserLocale as LocaleSupport;
+        }
+        
+        // Check for partial match (e.g., "en-US" -> "en")
+        const shortLocale = browserLocale.split("-")[0];
+        if (SUPPORTED_LOCALES.includes(shortLocale as LocaleSupport)) {
+          return shortLocale as LocaleSupport;
+        }
+      }
+    }
+
+    // 3. Fall back to default locale
+    return DEFAULT_LOCALE;
+  }
+
+  // Check if the user accessed only the domain (e.g., example.com → redirect to /en/home)
   if (pathname === "/") {
-    return NextResponse.redirect(new URL("/home", request.url));
+    const preferredLocale = getPreferredLocale();
+    const response = NextResponse.redirect(new URL(`/${preferredLocale}/home`, request.url));
+    
+    // Set cookie to remember the preference
+    response.cookies.set("NEXT_LOCALE", preferredLocale, {
+      maxAge: 60 * 60 * 24 * 365, // 1 year
+      httpOnly: false,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "lax",
+    });
+    
+    return response;
   }
 
   // Extract locale from the URL (first segment)
   const pathSegments = pathname.split("/");
-  const hasLocale = SUPPORTED_LOCALES.includes(
-    pathSegments[1] as LocaleSupport,
-  );
+  const potentialLocale = pathSegments[1];
+  const hasValidLocale = SUPPORTED_LOCALES.includes(potentialLocale as LocaleSupport);
 
-  if (!hasLocale) {
-    // Get locale from cookies or use the default
-    const cookies = request.cookies;
-    const savedLocale = cookies.get("NEXT_LOCALE")?.value || DEFAULT_LOCALE;
-
-    // Redirect to the same path but with locale prefix
-    const newUrl = new URL(`/${savedLocale}${pathname}${search}`, request.url);
+  if (!hasValidLocale) {
+    // Get preferred locale and redirect
+    const preferredLocale = getPreferredLocale();
+    const newUrl = new URL(`/${preferredLocale}${pathname}${search}`, request.url);
     const response = NextResponse.redirect(newUrl);
+    
+    // Set cookie to remember the preference
+    response.cookies.set("NEXT_LOCALE", preferredLocale, {
+      maxAge: 60 * 60 * 24 * 365, // 1 year
+      httpOnly: false,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "lax",
+    });
+    
     return response;
   }
 
-  // Continue to the requested page if everything is fine
+  // If we have a valid locale, update the cookie if it's different
+  const currentLocale = potentialLocale as LocaleSupport;
+  const savedLocale = request.cookies.get("NEXT_LOCALE")?.value;
+  
+  if (savedLocale !== currentLocale) {
+    const response = NextResponse.next();
+    response.cookies.set("NEXT_LOCALE", currentLocale, {
+      maxAge: 60 * 60 * 24 * 365, // 1 year
+      httpOnly: false,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "lax",
+    });
+    return response;
+  }
+
+  // Continue to the requested page
   return NextResponse.next();
 }
 

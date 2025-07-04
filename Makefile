@@ -15,7 +15,7 @@ dev_env_stop:
 
 dev_app_connect:
 	docker compose -f ./docker-compose.development.yaml exec -it node bash
-dev_app_start:
+dev_app_dev:
 	docker compose -f ./docker-compose.development.yaml exec -it node yarn dev
 
 prod_env_up:

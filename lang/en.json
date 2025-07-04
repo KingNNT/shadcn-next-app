@@ -1,0 +1,24 @@
+{
+  "common": {
+    "home": "Home",
+    "about": "About",
+    "contact": "Contact",
+    "welcome": "Welcome",
+    "language": "Language",
+    "copyright": "All rights reserved"
+  },
+  "navigation": {
+    "title": "Kingnnt.org",
+    "home": "Home",
+    "about": "About",
+    "contact": "Contact"
+  },
+  "pages": {
+    "home": {
+      "title": "Welcome to Kingnnt.org",
+      "subtitle": "Kingnnt Organization",
+      "description": "Kingnnt.org is Kingnnt Organization, an organization providing coding services.",
+      "fullDescription": "Kingnnt.org is dedicated to delivering high-quality coding solutions tailored to meet the unique needs of our clients. Our team of experienced developers specializes in creating robust, scalable, and efficient software applications. Whether you need web development, mobile app development, or custom software solutions, Kingnnt.org is here to help."
+    }
+  }
+}

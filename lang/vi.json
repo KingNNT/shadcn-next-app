@@ -1,0 +1,24 @@
+{
+  "common": {
+    "home": "Trang chủ",
+    "about": "Giới thiệu",
+    "contact": "Liên hệ",
+    "welcome": "Chào mừng",
+    "language": "Ngôn ngữ",
+    "copyright": "Bản quyền thuộc về"
+  },
+  "navigation": {
+    "title": "Kingnnt.org",
+    "home": "Trang chủ",
+    "about": "Giới thiệu",
+    "contact": "Liên hệ"
+  },
+  "pages": {
+    "home": {
+      "title": "Chào mừng đến với Kingnnt.org",
+      "subtitle": "Tổ chức Kingnnt",
+      "description": "Kingnnt.org là Tổ chức Kingnnt, một tổ chức cung cấp dịch vụ lập trình.",
+      "fullDescription": "Kingnnt.org cam kết cung cấp các giải pháp lập trình chất lượng cao được thiết kế riêng để đáp ứng nhu cầu độc đáo của khách hàng. Đội ngũ các nhà phát triển có kinh nghiệm của chúng tôi chuyên tạo ra các ứng dụng phần mềm mạnh mẽ, có khả năng mở rộng và hiệu quả. Dù bạn cần phát triển web, phát triển ứng dụng di động hay các giải pháp phần mềm tùy chỉnh, Kingnnt.org luôn sẵn sàng hỗ trợ."
+    }
+  }
+}

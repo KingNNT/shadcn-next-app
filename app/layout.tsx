@@ -1,7 +1,8 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
-import { ThemeProvider } from "@/components/theme-provider";
+import { SessionProvider } from "@/components/providers/session-provider";
+import { ThemeProvider } from "@/components/providers/theme-provider";
 
 const geistSans = Geist({
 	variable: "--font-geist-sans",
@@ -14,32 +15,34 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-	title: "Kingnnt.org",
-	description: "Kingnnt Organization - Professional coding services",
+	title: "KingNNT.org",
+	description: "KingNNT Organization - Professional coding services",
 };
 
-export default function RootLayout({
+const RootLayout = ({
 	children,
 }: Readonly<{
 	children: React.ReactNode;
-}>) {
+}>) => {
 	return (
-		<>
+		<html lang="en" suppressHydrationWarning>
 			<head>
 				<link rel="icon" href="/favicon.ico" />
 			</head>
-			<body
-				className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-			>
-				<ThemeProvider
-					attribute="class"
-					defaultTheme="system"
-					enableSystem
-					disableTransitionOnChange
-				>
-					{children}
-				</ThemeProvider>
+			<body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
+				<SessionProvider>
+					<ThemeProvider
+						attribute="class"
+						defaultTheme="system"
+						enableSystem
+						disableTransitionOnChange
+					>
+						{children}
+					</ThemeProvider>
+				</SessionProvider>
 			</body>
-		</>
+		</html>
 	);
-}
+};
+
+export default RootLayout;

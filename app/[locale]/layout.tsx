@@ -1,18 +1,9 @@
 import type { Metadata } from "next";
-import { LocaleSupport } from "@/enums";
-import { IntlProvider } from "@/components/intl-provider";
+import { IntlProvider } from "@/components/providers/intl-provider";
+import type { LocaleLayoutProps } from "@/types/page";
 
-interface LocaleLayoutProps {
-	children: React.ReactNode;
-	params: {
-		locale: LocaleSupport;
-	};
-}
-
-export async function generateMetadata({
-	params,
-}: LocaleLayoutProps): Promise<Metadata> {
-	const { locale } = params;
+export async function generateMetadata({ params }: LocaleLayoutProps): Promise<Metadata> {
+	const { locale } = await params;
 
 	// Basic metadata that will be enhanced per page
 	return {
@@ -26,14 +17,14 @@ export async function generateMetadata({
 	};
 }
 
-export default function LocaleLayout({ children, params }: LocaleLayoutProps) {
-	const { locale } = params;
+const LocaleLayout = async ({ children, params }: LocaleLayoutProps) => {
+	const { locale } = await params;
 
 	return (
 		<IntlProvider locale={locale}>
-			<div data-locale={locale}>
-				{children}
-			</div>
+			<div data-locale={locale}>{children}</div>
 		</IntlProvider>
 	);
-}
+};
+
+export default LocaleLayout;

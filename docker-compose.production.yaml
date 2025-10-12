@@ -3,9 +3,9 @@ networks:
     driver: bridge
 
 services:
-  node:
-    container_name: ${APP_NAME}_prod_node
-    hostname: ${APP_NAME}_prod_node
+  app:
+    container_name: ${APP_NAME}_prod_app
+    hostname: ${APP_NAME}_prod_app
     restart: unless-stopped
     build:
       context: .
@@ -14,3 +14,7 @@ services:
       - .env
     networks:
       - network_app
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=production

@@ -1,32 +1,23 @@
+# Makefile for shadcn-next-app
+
+# Include variables first
 include .env
+include make/variables.mk
 
-dev_env_up:
-	docker compose -f ./docker-compose.development.yaml up -d
-dev_env_restart:
-	docker compose -f ./docker-compose.development.yaml up -d --build
-dev_env_down:
-	docker compose -f ./docker-compose.development.yaml down
-dev_env_rm:
-	docker compose -f ./docker-compose.development.yaml down --rmi local -v
-dev_env_start:
-	docker compose -f ./docker-compose.development.yaml start
-dev_env_stop:
-	docker compose -f ./docker-compose.development.yaml stop
+# Default target
+.DEFAULT_GOAL := help
 
-dev_app_connect:
-	docker compose -f ./docker-compose.development.yaml exec -it node bash
-dev_app_dev:
-	docker compose -f ./docker-compose.development.yaml exec -it node yarn dev
+.PHONY: help
+help: ## Show this help message
+	@printf "$(BOLD)shadcn-next-app Commands$(RESET)\n"
+	@printf "\n"
+	@printf "$(BOLD)$(YELLOW)Docker & Environment:$(RESET)\n"
+	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' make/docker.mk | awk 'BEGIN {FS = ":.*?## "}; {printf "  $(BLUE)%-20s$(RESET) %s\n", $$1, $$2}'
+	@printf "\n"
+	@printf "$(BOLD)$(YELLOW)Application:$(RESET)\n"
+	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' make/app.mk | awk 'BEGIN {FS = ":.*?## "}; {printf "  $(BLUE)%-20s$(RESET) %s\n", $$1, $$2}'
+	@printf "\n"
 
-prod_env_up:
-	docker compose -f ./docker-compose.production.yaml up -d
-prod_env_restart:
-	docker compose -f ./docker-compose.production.yaml up -d --build
-prod_env_down:
-	docker compose -f ./docker-compose.production.yaml down
-prod_env_rm:
-	docker compose -f ./docker-compose.production.yaml down --rmi local -v
-prod_env_start:
-	docker compose -f ./docker-compose.production.yaml start
-prod_env_stop:
-	docker compose -f ./docker-compose.production.yaml stop
+# Include modular makefiles
+include make/docker.mk
+include make/app.mk

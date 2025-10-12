@@ -1,31 +1,73 @@
-FROM node:22.15.0
+# Stage 1: Dependencies
+FROM node:24.11.1-alpine AS deps
 
 LABEL maintainer="KingNNT"
 
-ARG UID_HOST_USER
-ARG GID_HOST_USER
-ARG NAME_CONTAINER_GROUP=group_container
-ARG NAME_CONTAINER_USER=user_container
+WORKDIR /app
 
-RUN apt update
+# Install yarn (stable = v4)
+RUN corepack enable && corepack prepare yarn@stable --activate
 
-RUN userdel -r node
-RUN echo UID_HOST_USER = ${UID_HOST_USER} - GID_HOST_USER = ${GID_HOST_USER}
-RUN addgroup --system --gid ${GID_HOST_USER} ${NAME_CONTAINER_GROUP}
-RUN adduser --system -uid ${UID_HOST_USER} --home /home/${NAME_CONTAINER_USER} --disabled-password ${NAME_CONTAINER_USER}
-RUN adduser ${NAME_CONTAINER_USER} ${NAME_CONTAINER_GROUP}
-RUN usermod --gid sudo ${NAME_CONTAINER_USER}
+# Copy package files and Yarn configuration
+COPY package.json yarn.lock .yarnrc.yml ./
+COPY .yarn ./.yarn
 
-ENV NPM_CONFIG_PREFIX=/home/${NAME_CONTAINER_USER}/.npm-global
-ENV PATH=$PATH:/home/${NAME_CONTAINER_USER}/.npm-global/bin
+# Install production dependencies
+RUN yarn install --immutable --production
 
-USER ${NAME_CONTAINER_USER}
+# Stage 2: Builder
+FROM node:24.11.1-alpine AS builder
 
 WORKDIR /app
 
-ADD package.json .
-ADD yarn.lock .
+# Install yarn (stable = v4)
+RUN corepack enable && corepack prepare yarn@stable --activate
 
-RUN yarn install
+# Copy package files and Yarn configuration
+COPY package.json yarn.lock .yarnrc.yml ./
+COPY .yarn ./.yarn
+
+# Install all dependencies
+RUN yarn install --immutable
+
+# Copy source code
+COPY . .
+
+# Build the application
+ENV NEXT_TELEMETRY_DISABLED=1
+RUN yarn build
+
+# Stage 3: Runner
+FROM node:24.11.1-alpine AS runner
+
+LABEL maintainer="KingNNT"
+
+WORKDIR /app
+
+ENV NODE_ENV=production
+ENV NEXT_TELEMETRY_DISABLED=1
+
+# Install yarn
+RUN corepack enable && corepack prepare yarn@stable --activate
+
+# Create non-root user
+RUN addgroup --system --gid 1001 nodejs
+RUN adduser --system --uid 1001 nextjs
+
+# Copy dependencies and built files
+COPY --from=deps /app/node_modules ./node_modules
+COPY --from=builder /app/.next ./.next
+COPY --from=builder /app/public ./public
+COPY --from=builder /app/package.json ./package.json
+
+# Set ownership
+RUN chown -R nextjs:nodejs /app
+
+USER nextjs
 
 EXPOSE 3000
+
+ENV PORT=3000
+ENV HOSTNAME="0.0.0.0"
+
+CMD ["yarn", "start"]

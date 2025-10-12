@@ -1,7 +1,7 @@
 "use client";
 
-import { useRouter, usePathname } from "next/navigation";
-import { LocaleSupport } from "@/enums";
+import { Globe } from "lucide-react";
+import { usePathname, useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import {
 	DropdownMenu,
@@ -9,26 +9,27 @@ import {
 	DropdownMenuItem,
 	DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Globe } from "lucide-react";
+import { LocaleSupport } from "@/enums";
 
 interface LocaleSwitcherProps {
 	currentLocale: LocaleSupport;
 }
 
-export function LocaleSwitcher({ currentLocale }: LocaleSwitcherProps) {
+export const LocaleSwitcher = ({ currentLocale }: LocaleSwitcherProps) => {
 	const router = useRouter();
 	const pathname = usePathname();
 
 	const switchLocale = (newLocale: LocaleSupport) => {
 		// Remove current locale from pathname
 		const pathWithoutLocale = pathname.replace(/^\/[a-z]{2}/, "");
-		
+
 		// Build new path with new locale
 		const newPath = `/${newLocale}${pathWithoutLocale}`;
-		
+
 		// Set cookie for future visits
+		// eslint-disable-next-line react-hooks/immutability
 		document.cookie = `NEXT_LOCALE=${newLocale}; path=/; max-age=31536000; SameSite=lax`;
-		
+
 		// Navigate to new path
 		router.push(newPath);
 	};
@@ -48,12 +49,8 @@ export function LocaleSwitcher({ currentLocale }: LocaleSwitcherProps) {
 			<DropdownMenuTrigger asChild>
 				<Button variant="outline" size="sm" className="gap-2">
 					<Globe className="h-4 w-4" />
-					<span className="hidden sm:inline">
-						{localeNames[currentLocale]}
-					</span>
-					<span className="sm:hidden">
-						{localeFlags[currentLocale]}
-					</span>
+					<span className="hidden sm:inline">{localeNames[currentLocale]}</span>
+					<span className="sm:hidden">{localeFlags[currentLocale]}</span>
 				</Button>
 			</DropdownMenuTrigger>
 			<DropdownMenuContent align="end">
@@ -70,4 +67,4 @@ export function LocaleSwitcher({ currentLocale }: LocaleSwitcherProps) {
 			</DropdownMenuContent>
 		</DropdownMenu>
 	);
-}
+};

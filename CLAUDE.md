@@ -155,10 +155,10 @@ yarn precommit    # Run format, lint, and scan
 - `.docker/`: Docker configuration files
   - `.docker/development/node/`: Development Dockerfile (Node 24.11.1, Yarn 4.12.0)
   - `.docker/production/node/`: Production Dockerfile
-- `make/`: Modular Makefile components
-  - `make/variables.mk`: Environment variables
-  - `make/docker.mk`: Docker commands
-  - `make/app.mk`: Application commands
+- `makefiles/`: Modular Makefile components
+  - `makefiles/variables.mk`: Environment variables
+  - `makefiles/docker.mk`: Docker commands
+  - `makefiles/app.mk`: Application commands
 
 ### Internationalization (i18n)
 - **Supported locales**: English (`en`), Vietnamese (`vi`)

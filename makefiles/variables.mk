@@ -9,12 +9,32 @@ BOLD   := \033[1m
 RESET  := \033[0m
 
 # Docker compose files
-DOCKER_COMPOSE_DEV  := docker-compose.development.yaml
-DOCKER_COMPOSE_PROD := docker-compose.production.yaml
+DOCKER_COMPOSE_BASE  := docker-compose.yml
+DOCKER_COMPOSE_LOCAL := docker-compose.override.yml
+DOCKER_COMPOSE_DEV   := docker-compose.development.yml
+DOCKER_COMPOSE_PROD  := docker-compose.production.yml
+
+# Compose commands for each environment
+# Local uses default behavior (auto-loads override.yml)
+DC_LOCAL := docker compose
+# Development and Production require explicit files
+DC_DEV   := docker compose -f $(DOCKER_COMPOSE_BASE) -f $(DOCKER_COMPOSE_DEV)
+DC_PROD  := docker compose -f $(DOCKER_COMPOSE_BASE) -f $(DOCKER_COMPOSE_PROD)
+
+# Default environment (can be overridden: make ENV=dev up)
+ENV ?= local
+
+# Dynamic compose command based on ENV
+ifeq ($(ENV),local)
+  DC := $(DC_LOCAL)
+else ifeq ($(ENV),dev)
+  DC := $(DC_DEV)
+else ifeq ($(ENV),prod)
+  DC := $(DC_PROD)
+else
+  DC := $(DC_LOCAL)
+endif
 
 # Application variables
 APP_NAME ?= shadcn-next-app
 NODE_ENV ?= development
-
-# Docker variables
-DOCKER_EXEC_NODE := docker compose -f $(DOCKER_COMPOSE_DEV) exec -it node

@@ -1,5 +1,5 @@
 # Stage 1: Dependencies
-FROM node:24.11.1-alpine AS deps
+FROM node:24.12.0-alpine AS deps
 
 LABEL maintainer="KingNNT"
 
@@ -16,7 +16,7 @@ COPY .yarn ./.yarn
 RUN yarn install --immutable --production
 
 # Stage 2: Builder
-FROM node:24.11.1-alpine AS builder
+FROM node:24.12.0-alpine AS builder
 
 WORKDIR /app
 
@@ -38,7 +38,7 @@ ENV NEXT_TELEMETRY_DISABLED=1
 RUN yarn build
 
 # Stage 3: Runner
-FROM node:24.11.1-alpine AS runner
+FROM node:24.12.0-alpine AS runner
 
 LABEL maintainer="KingNNT"
 

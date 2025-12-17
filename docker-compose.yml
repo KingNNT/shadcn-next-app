@@ -1,0 +1,15 @@
+# docker-compose.yml - Base configuration for all environments
+# This file is automatically combined with docker-compose.override.yml for local development
+# For other environments, use: docker compose -f docker-compose.yml -f docker-compose.<env>.yml
+
+networks:
+  network_app:
+    driver: bridge
+
+services:
+  app:
+    restart: unless-stopped
+    networks:
+      - network_app
+    expose:
+      - "3000"

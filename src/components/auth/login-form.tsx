@@ -8,6 +8,7 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { useIntl } from "react-intl";
 import * as z from "zod";
+import { PasswordInput } from "@/components/common/password-input";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import {
@@ -121,8 +122,7 @@ export const LoginForm = () => {
 								<FormItem>
 									<FormLabel>{intl.formatMessage({ id: "pages.login.password" })}</FormLabel>
 									<FormControl>
-										<Input
-											type="password"
+										<PasswordInput
 											placeholder={intl.formatMessage({ id: "pages.login.passwordPlaceholder" })}
 											disabled={isLoading}
 											{...field}

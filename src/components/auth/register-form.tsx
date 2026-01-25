@@ -8,6 +8,7 @@ import { useForm } from "react-hook-form";
 import { useIntl } from "react-intl";
 import * as z from "zod";
 import { authApi, HttpStatusError } from "@/apis";
+import { PasswordInput } from "@/components/common/password-input";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import {
@@ -144,8 +145,7 @@ export const RegisterForm = () => {
 								<FormItem>
 									<FormLabel>{intl.formatMessage({ id: "pages.register.password" })}</FormLabel>
 									<FormControl>
-										<Input
-											type="password"
+										<PasswordInput
 											autoComplete="new-password"
 											placeholder={intl.formatMessage({ id: "pages.register.passwordPlaceholder" })}
 											disabled={isLoading}
@@ -166,8 +166,7 @@ export const RegisterForm = () => {
 										{intl.formatMessage({ id: "pages.register.confirmPassword" })}
 									</FormLabel>
 									<FormControl>
-										<Input
-											type="password"
+										<PasswordInput
 											autoComplete="new-password"
 											placeholder={intl.formatMessage({
 												id: "pages.register.confirmPasswordPlaceholder",

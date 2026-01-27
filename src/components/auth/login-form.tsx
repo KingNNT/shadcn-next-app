@@ -4,9 +4,9 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { signIn } from "next-auth/react";
+import { useLocale, useTranslations } from "next-intl";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
-import { useIntl } from "react-intl";
 import * as z from "zod";
 import { PasswordInput } from "@/components/common/password-input";
 import { Button } from "@/components/ui/button";
@@ -26,7 +26,8 @@ import { AUTH_ERROR_CODES, AUTH_ERROR_MESSAGE_IDS } from "@/constants";
 export const LoginForm = () => {
 	const router = useRouter();
 	const searchParams = useSearchParams();
-	const intl = useIntl();
+	const locale = useLocale();
+	const t = useTranslations("pages.login");
 	const [error, setError] = useState<string>("");
 	const [isLoading, setIsLoading] = useState(false);
 
@@ -37,10 +38,8 @@ export const LoginForm = () => {
 		typeof code === "string" && code in AUTH_ERROR_MESSAGE_IDS;
 
 	const loginSchema = z.object({
-		email: z.string().email(intl.formatMessage({ id: "pages.login.validation.invalidEmail" })),
-		password: z
-			.string()
-			.min(6, intl.formatMessage({ id: "pages.login.validation.passwordMinLength" })),
+		email: z.string().email(t("validation.invalidEmail")),
+		password: z.string().min(6, t("validation.passwordMinLength")),
 	});
 
 	type LoginFormData = z.infer<typeof loginSchema>;
@@ -72,16 +71,20 @@ export const LoginForm = () => {
 					: AUTH_ERROR_CODES.INVALID_CREDENTIALS;
 				const messageId = AUTH_ERROR_MESSAGE_IDS[errorCode];
 
-				setError(intl.formatMessage({ id: messageId }));
+				// Map error message IDs to translation keys
+				const errorKeyMap: Record<string, string> = {
+					"pages.login.invalidCredentials": "invalidCredentials",
+				};
+				const errorKey = errorKeyMap[messageId] || "generalError";
+				setError(t(errorKey));
 				return;
 			}
 
-			const locale = intl.locale;
 			const redirectUrl = signInResult.url || callbackUrl || `/${locale}/dashboard`;
 			router.push(redirectUrl);
 			router.refresh();
 		} catch {
-			setError(intl.formatMessage({ id: "pages.login.generalError" }));
+			setError(t("generalError"));
 		} finally {
 			setIsLoading(false);
 		}
@@ -90,8 +93,8 @@ export const LoginForm = () => {
 	return (
 		<Card className="w-full max-w-md">
 			<CardHeader>
-				<CardTitle>{intl.formatMessage({ id: "pages.login.title" })}</CardTitle>
-				<CardDescription>{intl.formatMessage({ id: "pages.login.description" })}</CardDescription>
+				<CardTitle>{t("title")}</CardTitle>
+				<CardDescription>{t("description")}</CardDescription>
 			</CardHeader>
 			<CardContent>
 				<Form {...form}>
@@ -101,11 +104,11 @@ export const LoginForm = () => {
 							name="email"
 							render={({ field }) => (
 								<FormItem>
-									<FormLabel>{intl.formatMessage({ id: "pages.login.email" })}</FormLabel>
+									<FormLabel>{t("email")}</FormLabel>
 									<FormControl>
 										<Input
 											type="email"
-											placeholder={intl.formatMessage({ id: "pages.login.emailPlaceholder" })}
+											placeholder={t("emailPlaceholder")}
 											disabled={isLoading}
 											{...field}
 										/>
@@ -120,10 +123,10 @@ export const LoginForm = () => {
 							name="password"
 							render={({ field }) => (
 								<FormItem>
-									<FormLabel>{intl.formatMessage({ id: "pages.login.password" })}</FormLabel>
+									<FormLabel>{t("password")}</FormLabel>
 									<FormControl>
 										<PasswordInput
-											placeholder={intl.formatMessage({ id: "pages.login.passwordPlaceholder" })}
+											placeholder={t("passwordPlaceholder")}
 											disabled={isLoading}
 											{...field}
 										/>
@@ -140,19 +143,17 @@ export const LoginForm = () => {
 						)}
 
 						<Button type="submit" className="w-full" disabled={isLoading}>
-							{isLoading
-								? intl.formatMessage({ id: "pages.login.signingIn" })
-								: intl.formatMessage({ id: "pages.login.signIn" })}
+							{isLoading ? t("signingIn") : t("signIn")}
 						</Button>
 
 						<div className="mt-4 text-center text-muted-foreground text-sm">
-							{intl.formatMessage({ id: "pages.login.demoCredentials" })}
+							{t("demoCredentials")}
 						</div>
 
 						<div className="mt-4 text-center text-muted-foreground text-sm">
-							{intl.formatMessage({ id: "pages.login.noAccount" })}{" "}
-							<Link href={`/${intl.locale}/register`} className="text-primary hover:underline">
-								{intl.formatMessage({ id: "pages.login.registerLink" })}
+							{t("noAccount")}{" "}
+							<Link href={`/${locale}/register`} className="text-primary hover:underline">
+								{t("registerLink")}
 							</Link>
 						</div>
 					</form>

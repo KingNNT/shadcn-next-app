@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
 import { IntlProvider } from "@/components/providers/intl-provider";
+import type { Locale } from "@/i18n/config";
+import { loadMessages } from "@/i18n/request";
 import type { ILocaleLayoutProps } from "@/types/page";
 
 export async function generateMetadata({ params }: ILocaleLayoutProps): Promise<Metadata> {
@@ -19,9 +21,10 @@ export async function generateMetadata({ params }: ILocaleLayoutProps): Promise<
 
 const LocaleLayout = async ({ children, params }: ILocaleLayoutProps) => {
 	const { locale } = await params;
+	const messages = await loadMessages(locale as Locale);
 
 	return (
-		<IntlProvider locale={locale}>
+		<IntlProvider locale={locale} messages={messages}>
 			<div data-locale={locale}>{children}</div>
 		</IntlProvider>
 	);

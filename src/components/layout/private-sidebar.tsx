@@ -3,35 +3,34 @@
 import { LayoutDashboard, Settings, User, X } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useIntl } from "react-intl";
+import { useLocale, useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
-import type { LocaleSupport } from "@/enums";
-import { cn } from "@/lib/utils";
+import { cn } from "@/libs/utils";
 
 interface IPrivateSidebarProps {
-	locale: LocaleSupport;
 	isOpen?: boolean;
 	onClose?: () => void;
 }
 
-export const PrivateSidebar = ({ locale, isOpen = true, onClose }: IPrivateSidebarProps) => {
-	const intl = useIntl();
+export const PrivateSidebar = ({ isOpen = true, onClose }: IPrivateSidebarProps) => {
+	const locale = useLocale();
+	const t = useTranslations("navigation");
 	const pathname = usePathname();
 
 	const menuItems = [
 		{
 			icon: LayoutDashboard,
-			label: intl.formatMessage({ id: "navigation.dashboard" }),
+			label: t("dashboard"),
 			href: `/${locale}/dashboard`,
 		},
 		{
 			icon: User,
-			label: intl.formatMessage({ id: "navigation.profile" }),
+			label: t("profile"),
 			href: `/${locale}/profile`,
 		},
 		{
 			icon: Settings,
-			label: intl.formatMessage({ id: "navigation.settings" }),
+			label: t("settings"),
 			href: `/${locale}/settings`,
 		},
 	];
@@ -52,7 +51,7 @@ export const PrivateSidebar = ({ locale, isOpen = true, onClose }: IPrivateSideb
 			>
 				{/* Close button for mobile */}
 				<div className="flex items-center justify-between border-b p-4 lg:hidden">
-					<h2 className="font-semibold text-lg">{intl.formatMessage({ id: "navigation.menu" })}</h2>
+					<h2 className="font-semibold text-lg">{t("menu")}</h2>
 					<Button variant="ghost" size="icon" onClick={onClose}>
 						<X className="h-5 w-5" />
 					</Button>

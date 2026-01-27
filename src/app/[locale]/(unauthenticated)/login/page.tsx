@@ -1,14 +1,15 @@
 import type { Metadata } from "next";
+import { getTranslations } from "next-intl/server";
 import { LoginForm } from "@/components/auth/login-form";
-import { getMessage } from "@/lib/intl";
 import type { ILocalePageProps } from "@/types/page";
 
 export async function generateMetadata({ params }: ILocalePageProps): Promise<Metadata> {
 	const { locale } = await params;
+	const t = await getTranslations({ locale, namespace: "pages.login" });
 
 	return {
-		title: getMessage(locale, "pages.login.title"),
-		description: getMessage(locale, "pages.login.description"),
+		title: t("title"),
+		description: t("description"),
 		alternates: {
 			canonical: `/${locale}/login`,
 			languages: {

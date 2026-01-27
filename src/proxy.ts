@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { LocaleSupport } from "@/enums";
+import { defaultLocale, type Locale, locales } from "@/i18n/config";
 import { auth } from "@/services/next-auth";
 import { isPrivateRoute } from "@/utils/routes";
 
@@ -9,16 +9,13 @@ export default auth((request) => {
 	const search = url.search;
 	const isLoggedIn = !!request.auth?.user;
 
-	const SUPPORTED_LOCALES = [LocaleSupport.EN, LocaleSupport.VI];
-	const DEFAULT_LOCALE = LocaleSupport.EN;
-
 	// Helper function to get preferred locale
-	function getPreferredLocale(): LocaleSupport {
+	function getPreferredLocale(): Locale {
 		// 1. Check for saved locale in cookies
 		const cookies = request.cookies;
 		const savedLocale = cookies.get("NEXT_LOCALE")?.value;
-		if (savedLocale && SUPPORTED_LOCALES.includes(savedLocale as LocaleSupport)) {
-			return savedLocale as LocaleSupport;
+		if (savedLocale && locales.includes(savedLocale as Locale)) {
+			return savedLocale as Locale;
 		}
 
 		// 2. Check Accept-Language header
@@ -30,20 +27,20 @@ export default auth((request) => {
 
 			for (const browserLocale of browserLocales) {
 				// Check for exact match (e.g., "en" or "vi")
-				if (SUPPORTED_LOCALES.includes(browserLocale as LocaleSupport)) {
-					return browserLocale as LocaleSupport;
+				if (locales.includes(browserLocale as Locale)) {
+					return browserLocale as Locale;
 				}
 
 				// Check for partial match (e.g., "en-US" -> "en")
 				const shortLocale = browserLocale.split("-")[0];
-				if (SUPPORTED_LOCALES.includes(shortLocale as LocaleSupport)) {
-					return shortLocale as LocaleSupport;
+				if (locales.includes(shortLocale as Locale)) {
+					return shortLocale as Locale;
 				}
 			}
 		}
 
 		// 3. Fall back to default locale
-		return DEFAULT_LOCALE;
+		return defaultLocale;
 	}
 
 	// Check if the user accessed only the domain (e.g., example.com → redirect to /en/home)
@@ -65,7 +62,7 @@ export default auth((request) => {
 	// Extract locale from the URL (first segment)
 	const pathSegments = pathname.split("/");
 	const potentialLocale = pathSegments[1];
-	const hasValidLocale = SUPPORTED_LOCALES.includes(potentialLocale as LocaleSupport);
+	const hasValidLocale = locales.includes(potentialLocale as Locale);
 
 	if (!hasValidLocale) {
 		// Get preferred locale and redirect
@@ -85,7 +82,7 @@ export default auth((request) => {
 	}
 
 	// If we have a valid locale, update the cookie if it's different
-	const currentLocale = potentialLocale as LocaleSupport;
+	const currentLocale = potentialLocale as Locale;
 	const savedLocale = request.cookies.get("NEXT_LOCALE")?.value;
 
 	// Extract the route path without locale (e.g., /en/dashboard -> /dashboard)

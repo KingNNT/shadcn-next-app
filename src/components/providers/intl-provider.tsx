@@ -1,26 +1,24 @@
 "use client";
 
-import { IntlProvider as ReactIntlProvider } from "react-intl";
-import { LocaleSupport } from "@/enums";
-import { getLocaleDirection, getMessages } from "@/lib/intl";
+import type { AbstractIntlMessages } from "next-intl";
+import { NextIntlClientProvider } from "next-intl";
 
 interface IIntlProviderProps {
-	locale: LocaleSupport;
+	locale: string;
+	messages: AbstractIntlMessages;
+	timeZone?: string;
 	children: React.ReactNode;
 }
 
-export const IntlProvider = ({ locale, children }: IIntlProviderProps) => {
-	const messages = getMessages(locale);
-	const textDirection = getLocaleDirection(locale);
-
+export const IntlProvider = ({
+	locale,
+	messages,
+	timeZone = "Asia/Ho_Chi_Minh",
+	children,
+}: IIntlProviderProps) => {
 	return (
-		<ReactIntlProvider
-			locale={locale}
-			messages={messages}
-			defaultLocale={LocaleSupport.EN}
-			textComponent="span"
-		>
-			<div dir={textDirection}>{children}</div>
-		</ReactIntlProvider>
+		<NextIntlClientProvider locale={locale} messages={messages} timeZone={timeZone}>
+			{children}
+		</NextIntlClientProvider>
 	);
 };

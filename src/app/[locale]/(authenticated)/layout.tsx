@@ -1,10 +1,11 @@
 import { PrivateLayoutWrapper } from "@/components/layout/private-layout-wrapper";
-import type { ILocaleLayoutProps } from "@/types/page";
 
-const PrivateLayout = async ({ children, params }: ILocaleLayoutProps) => {
-	const { locale } = await params;
+interface IPrivateLayoutProps {
+	children: React.ReactNode;
+}
 
-	return <PrivateLayoutWrapper locale={locale}>{children}</PrivateLayoutWrapper>;
+const PrivateLayout = ({ children }: IPrivateLayoutProps) => {
+	return <PrivateLayoutWrapper>{children}</PrivateLayoutWrapper>;
 };
 
 export default PrivateLayout;

@@ -1,11 +1,9 @@
-import type { LocaleSupport } from "@/enums";
-
 /**
  * Common props for pages under [locale] route
  */
 export interface ILocalePageProps {
 	params: Promise<{
-		locale: LocaleSupport;
+		locale: string;
 	}>;
 }
 
@@ -14,7 +12,7 @@ export interface ILocalePageProps {
  */
 export interface ILocaleLayoutProps {
 	params: Promise<{
-		locale: LocaleSupport;
+		locale: string;
 	}>;
 	children: React.ReactNode;
 }

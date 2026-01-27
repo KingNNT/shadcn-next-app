@@ -17,7 +17,7 @@ This is a Next.js 16 application with TypeScript, built with the App Router arch
 - **Radix UI** primitives for accessible components
 - **NextAuth.js v5.0.0-beta.30** for authentication
 - **React Hook Form v7.67.0** with **Zod v4.1.13** for form validation
-- **React Intl v7.1.14** for internationalization
+- **next-intl v4.x** for internationalization (Server Components support)
 - **Zustand v5.0.9** for state management
 - **Husky v9.1.7** + **lint-staged v16.2.7** for pre-commit hooks
 - **commitlint v20** for conventional commit enforcement
@@ -145,11 +145,16 @@ yarn precommit    # Run format, lint, and scan
     - `src/types/page.d.ts`: Page component types
   - `src/enums/`: TypeScript enumerations
     - `src/enums/locale.enum.ts`: LocaleSupport enum (EN, VI)
-  - `src/lang/`: Translation files (`en.json`, `vi.json`)
-  - `src/lib/`: Utility functions and configurations
-    - `src/lib/stores/`: Zustand state management stores
-    - `src/lib/intl/`: Internationalization utilities
-    - `src/lib/utils.ts`: Utility functions (cn, etc.)
+  - `src/i18n/`: Internationalization configuration
+    - `src/i18n/config.ts`: Locale definitions (locales, defaultLocale, Locale type)
+    - `src/i18n/request.ts`: Server-side next-intl request configuration
+    - `src/i18n/navigation.ts`: Locale-aware navigation (Link, useRouter, usePathname)
+    - `src/i18n/index.ts`: Re-exports all i18n utilities
+  - `src/langs/`: Translation files (`en.json`, `vi.json`)
+  - `src/libs/`: Utility functions and configurations
+    - `src/libs/stores/`: Zustand state management stores
+    - `src/libs/intl/`: Direction utility (getLocaleDirection for RTL support)
+    - `src/libs/utils.ts`: Utility functions (cn, etc.)
   - `src/proxy.ts`: Next.js middleware for locale and auth handling
 - `public/`: Static assets
 - `.docker/`: Docker configuration files
@@ -163,10 +168,15 @@ yarn precommit    # Run format, lint, and scan
 ### Internationalization (i18n)
 - **Supported locales**: English (`en`), Vietnamese (`vi`)
 - **Default locale**: English (`en`)
+- **Library**: next-intl v4.x (native Server Component support)
 - **Implementation**:
-  - `react-intl` for message formatting
-  - Messages stored in `src/lang/en.json` and `src/lang/vi.json`
-  - `src/lib/intl/index.ts` provides helper functions (`getMessages`, `getMessage`)
+  - Configuration in `src/i18n/` directory:
+    - `config.ts`: Locale definitions and types
+    - `request.ts`: Server-side request configuration for next-intl plugin
+    - `navigation.ts`: Locale-aware navigation utilities (Link, useRouter, usePathname)
+    - `index.ts`: Re-exports all utilities
+  - Messages stored in `src/langs/en.json` and `src/langs/vi.json` (nested JSON, no flattening needed)
+  - `next.config.ts` uses `createNextIntlPlugin` to wrap Next.js config
   - Middleware (`src/proxy.ts`) handles automatic locale detection:
     1. Check `NEXT_LOCALE` cookie
     2. Check `Accept-Language` header
@@ -174,6 +184,40 @@ yarn precommit    # Run format, lint, and scan
 - **Locale persistence**: Stored in `NEXT_LOCALE` cookie (1 year expiry)
 - **URL structure**: `/{locale}/{page}` (e.g., `/en/home`, `/vi/home`)
 - **Redirection**: Root path (`/`) redirects to `/{locale}/home`
+
+#### Usage Patterns
+
+**Client Components**:
+```typescript
+import { useTranslations, useLocale } from "next-intl";
+
+const MyComponent = () => {
+  const t = useTranslations("namespace"); // e.g., "pages.login"
+  const locale = useLocale();
+
+  return <p>{t("key")}</p>; // e.g., t("title") for pages.login.title
+};
+```
+
+**Server Components / Metadata**:
+```typescript
+import { getTranslations } from "next-intl/server";
+
+export async function generateMetadata({ params }: Props) {
+  const { locale } = await params;
+  const t = await getTranslations({ locale, namespace: "pages.home" });
+
+  return { title: t("title") };
+}
+```
+
+**Locale-Aware Navigation**:
+```typescript
+import { useRouter, usePathname } from "@/i18n";
+
+const router = useRouter();
+router.replace(pathname, { locale: "vi" }); // Switch locale
+```
 
 ## Authentication
 
@@ -282,8 +326,8 @@ docker compose -f docker-compose.development.yaml exec -it app npx shadcn@latest
 
 ### Path Aliases (defined in components.json)
 - `@/components` → components directory
-- `@/lib` → lib directory
-- `@/utils` → lib/utils
+- `@/lib` → libs directory
+- `@/utils` → libs/utils
 - `@/ui` → components/ui
 - `@/hooks` → hooks directory
 
@@ -299,11 +343,11 @@ docker compose -f docker-compose.development.yaml exec -it app npx shadcn@latest
 
 ### Zustand Stores
 - **Version**: 5.0.9
-- **Location**: `src/lib/stores/`
+- **Location**: `src/libs/stores/`
 - **Global state management** with Zustand
 - **Features**: DevTools and persistence middleware support
 
-#### App Store (`src/lib/stores/app-store.ts`)
+#### App Store (`src/libs/stores/app-store.ts`)
 Manages application-level settings:
 - **language**: User's preferred language (`en` | `vi`)
 - **timezone**: User's timezone setting
@@ -312,7 +356,7 @@ Manages application-level settings:
 
 Usage example:
 ```typescript
-import { useAppStore } from '@/lib/stores';
+import { useAppStore } from '@/libs/stores';
 
 // In a component
 const language = useAppStore((state) => state.language);
@@ -323,11 +367,11 @@ setLanguage('vi');
 ```
 
 #### Creating New Stores
-Follow the pattern in `src/lib/stores/app-store.ts`:
+Follow the pattern in `src/libs/stores/app-store.ts`:
 1. Define state interface
 2. Use `create` from `zustand`
 3. Export store hook
-4. Re-export from `src/lib/stores/index.ts`
+4. Re-export from `src/libs/stores/index.ts`
 
 ## Form Handling
 
@@ -590,7 +634,7 @@ APP_NAME=shadcn-next-app # Used for container naming
 - **Utilities**: `tailwind-merge` (v3.4.0) for conditional classes
 - **CVA**: `class-variance-authority` (v0.7.1) for component variants
 - **Helper**: `clsx` (v2.1.1) for conditional classNames
-- **cn utility**: Combines clsx + tailwind-merge in `src/lib/utils.ts`
+- **cn utility**: Combines clsx + tailwind-merge in `src/libs/utils.ts`
 
 ## Important Guidelines
 
@@ -601,10 +645,10 @@ APP_NAME=shadcn-next-app # Used for container naming
 4. **Port**: Development server runs on http://localhost:3333
 
 ### Code Standards
-1. **Internationalization** - Always add translations for new text/messages to both `src/lang/en.json` and `src/lang/vi.json`
+1. **Internationalization** - Always add translations for new text/messages to both `src/langs/en.json` and `src/langs/vi.json`
 2. **Locale routing** - New pages must follow `src/app/[locale]/(unauthenticated|authenticated)/[page]/page.tsx` structure
 3. **UI components** - Follow shadcn/ui patterns; prefer existing components before creating new ones
-4. **State management** - Use Zustand stores in `src/lib/stores/` for global state
+4. **State management** - Use Zustand stores in `src/libs/stores/` for global state
 5. **Forms** - Use React Hook Form + Zod + shadcn/ui Form components
 6. **Styling** - Use TailwindCSS classes; use `cn()` utility for conditional classes
 7. **Authentication** - Protected routes go in `src/app/[locale]/(authenticated)/`, public in `(unauthenticated)/`
@@ -652,7 +696,7 @@ APP_NAME=shadcn-next-app # Used for container naming
   - `constants/` - Application-wide constants
   - `types/` - TypeScript type definitions
   - `enums/` - TypeScript enumerations
-  - `lib/` - Third-party integrations and utilities
+  - `libs/` - Third-party integrations and utilities
 
 ### Key Architecture Patterns
 1. **Three-layer architecture**:

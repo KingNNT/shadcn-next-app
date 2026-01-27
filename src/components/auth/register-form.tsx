@@ -3,9 +3,9 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { useLocale, useTranslations } from "next-intl";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
-import { useIntl } from "react-intl";
 import * as z from "zod";
 import { authApi, HttpStatusError } from "@/apis";
 import { PasswordInput } from "@/components/common/password-input";
@@ -23,24 +23,20 @@ import { Input } from "@/components/ui/input";
 
 export const RegisterForm = () => {
 	const router = useRouter();
-	const intl = useIntl();
+	const locale = useLocale();
+	const t = useTranslations("pages.register");
 	const [error, setError] = useState<string>("");
 	const [isLoading, setIsLoading] = useState(false);
 
 	const registerSchema = z
 		.object({
-			name: z
-				.string()
-				.min(1, intl.formatMessage({ id: "pages.register.validation.nameRequired" }))
-				.min(2, intl.formatMessage({ id: "pages.register.validation.nameMinLength" })),
-			email: z.string().email(intl.formatMessage({ id: "pages.register.validation.invalidEmail" })),
-			password: z
-				.string()
-				.min(6, intl.formatMessage({ id: "pages.register.validation.passwordMinLength" })),
+			name: z.string().min(1, t("validation.nameRequired")).min(2, t("validation.nameMinLength")),
+			email: z.string().email(t("validation.invalidEmail")),
+			password: z.string().min(6, t("validation.passwordMinLength")),
 			confirmPassword: z.string(),
 		})
 		.refine((data) => data.password === data.confirmPassword, {
-			message: intl.formatMessage({ id: "pages.register.validation.passwordsNotMatch" }),
+			message: t("validation.passwordsNotMatch"),
 			path: ["confirmPassword"],
 		});
 
@@ -69,18 +65,17 @@ export const RegisterForm = () => {
 			});
 
 			// Registration successful - redirect to login
-			const locale = intl.locale;
 			router.push(`/${locale}/login`);
 		} catch (error) {
 			// Handle specific error cases
 			if (error instanceof HttpStatusError) {
 				if (error.statusCode === 409) {
-					setError(intl.formatMessage({ id: "pages.register.emailExists" }));
+					setError(t("emailExists"));
 				} else {
-					setError(intl.formatMessage({ id: "pages.register.generalError" }));
+					setError(t("generalError"));
 				}
 			} else {
-				setError(intl.formatMessage({ id: "pages.register.generalError" }));
+				setError(t("generalError"));
 			}
 		} finally {
 			setIsLoading(false);
@@ -90,10 +85,8 @@ export const RegisterForm = () => {
 	return (
 		<Card className="w-full max-w-md">
 			<CardHeader>
-				<CardTitle>{intl.formatMessage({ id: "pages.register.title" })}</CardTitle>
-				<CardDescription>
-					{intl.formatMessage({ id: "pages.register.description" })}
-				</CardDescription>
+				<CardTitle>{t("title")}</CardTitle>
+				<CardDescription>{t("description")}</CardDescription>
 			</CardHeader>
 			<CardContent>
 				<Form {...form}>
@@ -103,12 +96,12 @@ export const RegisterForm = () => {
 							name="name"
 							render={({ field }) => (
 								<FormItem>
-									<FormLabel>{intl.formatMessage({ id: "pages.register.name" })}</FormLabel>
+									<FormLabel>{t("name")}</FormLabel>
 									<FormControl>
 										<Input
 											type="text"
 											autoComplete="name"
-											placeholder={intl.formatMessage({ id: "pages.register.namePlaceholder" })}
+											placeholder={t("namePlaceholder")}
 											disabled={isLoading}
 											{...field}
 										/>
@@ -123,12 +116,12 @@ export const RegisterForm = () => {
 							name="email"
 							render={({ field }) => (
 								<FormItem>
-									<FormLabel>{intl.formatMessage({ id: "pages.register.email" })}</FormLabel>
+									<FormLabel>{t("email")}</FormLabel>
 									<FormControl>
 										<Input
 											type="email"
 											autoComplete="email"
-											placeholder={intl.formatMessage({ id: "pages.register.emailPlaceholder" })}
+											placeholder={t("emailPlaceholder")}
 											disabled={isLoading}
 											{...field}
 										/>
@@ -143,11 +136,11 @@ export const RegisterForm = () => {
 							name="password"
 							render={({ field }) => (
 								<FormItem>
-									<FormLabel>{intl.formatMessage({ id: "pages.register.password" })}</FormLabel>
+									<FormLabel>{t("password")}</FormLabel>
 									<FormControl>
 										<PasswordInput
 											autoComplete="new-password"
-											placeholder={intl.formatMessage({ id: "pages.register.passwordPlaceholder" })}
+											placeholder={t("passwordPlaceholder")}
 											disabled={isLoading}
 											{...field}
 										/>
@@ -162,15 +155,11 @@ export const RegisterForm = () => {
 							name="confirmPassword"
 							render={({ field }) => (
 								<FormItem>
-									<FormLabel>
-										{intl.formatMessage({ id: "pages.register.confirmPassword" })}
-									</FormLabel>
+									<FormLabel>{t("confirmPassword")}</FormLabel>
 									<FormControl>
 										<PasswordInput
 											autoComplete="new-password"
-											placeholder={intl.formatMessage({
-												id: "pages.register.confirmPasswordPlaceholder",
-											})}
+											placeholder={t("confirmPasswordPlaceholder")}
 											disabled={isLoading}
 											{...field}
 										/>
@@ -187,15 +176,13 @@ export const RegisterForm = () => {
 						)}
 
 						<Button type="submit" className="w-full" disabled={isLoading}>
-							{isLoading
-								? intl.formatMessage({ id: "pages.register.signingUp" })
-								: intl.formatMessage({ id: "pages.register.signUp" })}
+							{isLoading ? t("signingUp") : t("signUp")}
 						</Button>
 
 						<div className="mt-4 text-center text-muted-foreground text-sm">
-							{intl.formatMessage({ id: "pages.register.haveAccount" })}{" "}
-							<Link href={`/${intl.locale}/login`} className="text-primary hover:underline">
-								{intl.formatMessage({ id: "pages.register.loginLink" })}
+							{t("haveAccount")}{" "}
+							<Link href={`/${locale}/login`} className="text-primary hover:underline">
+								{t("loginLink")}
 							</Link>
 						</div>
 					</form>

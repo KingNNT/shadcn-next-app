@@ -13,7 +13,8 @@
 		"prepare": "husky",
 		"scan": "run-p scan:gitleaks",
 		"scan:gitleaks": "./bin/gitleaks git --verbose",
-		"precommit": "yarn format && run-p lint scan"
+		"precommit": "yarn format && run-p lint scan",
+		"test:install": "bash node_modules/bats/bin/bats tests/install.bats"
 	},
 	"dependencies": {
 		"@hookform/resolvers": "^5.2.2",
@@ -43,6 +44,7 @@
 		"@types/node": "^24.10.1",
 		"@types/react": "^19.2.7",
 		"@types/react-dom": "^19.2.3",
+		"bats": "^1.13.0",
 		"husky": "^9.1.7",
 		"lint-staged": "^16.2.7",
 		"npm-run-all": "^4.1.5",

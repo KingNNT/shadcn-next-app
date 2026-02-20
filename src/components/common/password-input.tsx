@@ -28,7 +28,7 @@ export const PasswordInput = ({
 				type="button"
 				onClick={() => setShowPassword(!showPassword)}
 				disabled={props.disabled}
-				className="-translate-y-1/2 absolute top-1/2 right-3 text-muted-foreground transition-colors hover:text-foreground disabled:pointer-events-none disabled:opacity-50"
+				className="absolute top-1/2 right-3 -translate-y-1/2 text-muted-foreground transition-colors hover:text-foreground disabled:pointer-events-none disabled:opacity-50"
 				tabIndex={-1}
 			>
 				{showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}

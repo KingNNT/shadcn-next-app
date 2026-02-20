@@ -39,18 +39,46 @@ A production-ready Next.js 16 application with TypeScript, internationalization,
 
 ## ⚡ Quick Start
 
-**IMPORTANT: All development is done inside Docker containers.**
+### One-Line Installation (Recommended)
 
-### Prerequisites
-- Docker Desktop installed and running
-- Make (comes with macOS/Linux, install via chocolatey on Windows)
+Create a new project from this template with a single command:
 
-### Getting Started
+```bash
+curl -fsSL https://raw.githubusercontent.com/KingNNT/shadcn-next-app/develop/install.sh | bash
+```
+
+Or specify a project name directly:
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/KingNNT/shadcn-next-app/develop/install.sh | bash -s my-project
+```
+
+The installer will:
+1. Check prerequisites (Git, Docker, Make)
+2. Prompt for project name, description, and author info
+3. Clone the template and customize all configuration files
+4. Remove template history and initialize a fresh git repository
+5. Create an initial commit ready for development
+
+After installation:
+
+```bash
+cd my-project
+make dev
+```
+
+**Access the application**: http://localhost:3333
+
+### Manual Setup
+
+If you prefer to set up manually:
+
+**Prerequisites**: Docker Desktop and Make installed.
 
 ```bash
 # 1. Clone the repository
-git clone <repository-url>
-cd shadcn-next-app
+git clone https://github.com/KingNNT/shadcn-next-app.git my-project
+cd my-project
 
 # 2. Create environment file
 cp .env.example .env

@@ -64,9 +64,9 @@ make lint        # Start containers + run Biome check
 make build       # Start containers + build production bundle
 
 # Direct container execution (requires containers to be running)
-docker compose -f docker-compose.development.yaml exec -it app yarn dev
-docker compose -f docker-compose.development.yaml exec -it app yarn lint
-docker compose -f docker-compose.development.yaml exec -it app yarn build
+docker compose exec -it app yarn dev
+docker compose exec -it app yarn lint
+docker compose exec -it app yarn build
 ```
 
 ### Package Scripts (run via yarn in container)
@@ -318,10 +318,10 @@ export const PRIVATE_ROUTES = [
 ```bash
 # Run inside Docker container
 make shell
-npx shadcn@latest add [component-name]
+yarn dlx shadcn@latest add [component-name]
 
 # Or directly
-docker compose -f docker-compose.development.yaml exec -it app npx shadcn@latest add [component-name]
+docker compose exec -it app yarn dlx shadcn@latest add [component-name]
 ```
 
 ### Path Aliases (defined in components.json)
@@ -592,15 +592,23 @@ interface IListResponse<TObject> extends ISuccessResponse<TObject[]> {}
 
 ## Docker Configuration
 
+### Compose File Strategy
+- **`docker-compose.yml`** - Base configuration (networks, exposed ports)
+- **`docker-compose.override.yml`** - Local development overrides (auto-loaded by `docker compose`)
+- **`docker-compose.production.yml`** - Production overrides (requires `-f` flag)
+
+Local development: `docker compose up -d` (auto-loads base + override)
+Production: `docker compose -f docker-compose.yml -f docker-compose.production.yml up -d`
+
 ### Development Environment
-- **Compose file**: `docker-compose.development.yaml`
-- **Container name**: `shadcn-next-app_app` (from APP_NAME env var)
+- **Container name**: `${APP_NAME}_app` (from APP_NAME env var)
 - **Port mapping**: `3333:3000` (host:container)
 - **Volume**: `.:/app` (bind mount for hot reload)
 - **Network**: `network_app` (bridge driver)
 - **Restart policy**: `unless-stopped`
 - **Environment variables**: UID_HOST_USER, GID_HOST_USER for permission management
 - **Dockerfile**: `.docker/development/node/Dockerfile`
+- **Env files loaded**: `.env` + `.env.local`
 
 ### Environment Variables (`.env`)
 ```bash
@@ -612,7 +620,7 @@ APP_NAME=shadcn-next-app # Used for container naming
 
 ### Accessing the Application
 - **Local URL**: http://localhost:3333
-- **Container shell**: `make shell` or `docker compose -f docker-compose.development.yaml exec -it app bash`
+- **Container shell**: `make shell` or `docker compose exec -it app bash`
 
 ## TypeScript Configuration
 

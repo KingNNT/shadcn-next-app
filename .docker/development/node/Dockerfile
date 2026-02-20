@@ -23,8 +23,7 @@ RUN usermod -aG sudo ${NAME_CONTAINER_USER}
 # Enable and prepare Yarn stable (v4)
 RUN corepack enable && corepack prepare yarn@stable --activate
 
-ENV NPM_CONFIG_PREFIX=/home/${NAME_CONTAINER_USER}/.npm-global
-ENV PATH=$PATH:/home/${NAME_CONTAINER_USER}/.npm-global/bin
+ENV PATH=$PATH:/home/${NAME_CONTAINER_USER}/.yarn/bin
 
 WORKDIR /app
 

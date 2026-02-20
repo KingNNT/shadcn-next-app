@@ -1,17 +1,17 @@
 # docker-compose.override.yml - Local development environment
 # This file is AUTOMATICALLY loaded by Docker Compose
-# No -f flag needed for local development
+# No -f flag needed: just run `docker compose up -d`
 
 services:
   app:
-    container_name: ${APP_NAME}_local_app
-    hostname: ${APP_NAME}_local_app
+    container_name: ${APP_NAME}_app
+    hostname: ${APP_NAME}_app
     build:
       context: .
       dockerfile: .docker/development/node/Dockerfile
       args:
-        - UID_HOST_USER=${UID_HOST_USER}
-        - GID_HOST_USER=${GID_HOST_USER}
+        - UID_HOST_USER=${UID_HOST_USER:-1000}
+        - GID_HOST_USER=${GID_HOST_USER:-1000}
     tty: true
     stdin_open: true
     ports:

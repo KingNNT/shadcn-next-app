@@ -446,10 +446,10 @@ Edit both language files:
 ```bash
 # Inside container
 make shell
-npx shadcn@latest add [component-name]
+yarn dlx shadcn@latest add [component-name]
 
 # Example: Add dialog component
-npx shadcn@latest add dialog
+yarn dlx shadcn@latest add dialog
 ```
 
 ### Project Organization

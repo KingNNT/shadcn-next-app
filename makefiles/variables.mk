@@ -9,27 +9,20 @@ BOLD   := \033[1m
 RESET  := \033[0m
 
 # Docker compose files
-DOCKER_COMPOSE_BASE  := docker-compose.yml
-DOCKER_COMPOSE_LOCAL := docker-compose.override.yml
-DOCKER_COMPOSE_DEV   := docker-compose.development.yml
-DOCKER_COMPOSE_PROD  := docker-compose.production.yml
+DOCKER_COMPOSE_BASE := docker-compose.yml
+DOCKER_COMPOSE_PROD := docker-compose.production.yml
 
 # Compose commands for each environment
-# Local uses default behavior (auto-loads override.yml)
+# Local uses default behavior (auto-loads docker-compose.override.yml)
 DC_LOCAL := docker compose
-# Development and Production require explicit files
-DC_DEV   := docker compose -f $(DOCKER_COMPOSE_BASE) -f $(DOCKER_COMPOSE_DEV)
+# Production requires explicit files
 DC_PROD  := docker compose -f $(DOCKER_COMPOSE_BASE) -f $(DOCKER_COMPOSE_PROD)
 
-# Default environment (can be overridden: make ENV=dev up)
+# Default environment (can be overridden: make ENV=prod up)
 ENV ?= local
 
 # Dynamic compose command based on ENV
-ifeq ($(ENV),local)
-  DC := $(DC_LOCAL)
-else ifeq ($(ENV),dev)
-  DC := $(DC_DEV)
-else ifeq ($(ENV),prod)
+ifeq ($(ENV),prod)
   DC := $(DC_PROD)
 else
   DC := $(DC_LOCAL)

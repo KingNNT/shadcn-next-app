@@ -32,3 +32,24 @@ install: up ## Start containers and install dependencies
 exec: up ## Execute a command in the container (usage: make exec CMD="yarn add package")
 	@printf "$(CYAN)Executing command: $(CMD)$(RESET)\n"
 	$(DC) exec -it app $(CMD)
+
+# Production environment shortcuts
+.PHONY: prod-shell
+prod-shell: ## Connect to production container shell
+	@$(MAKE) shell ENV=prod
+
+.PHONY: prod-build
+prod-build: ## Build application in production
+	@$(MAKE) build ENV=prod
+
+.PHONY: prod-lint
+prod-lint: ## Run linter in production
+	@$(MAKE) lint ENV=prod
+
+.PHONY: prod-install
+prod-install: ## Install dependencies in production
+	@$(MAKE) install ENV=prod
+
+.PHONY: prod-exec
+prod-exec: ## Execute command in production (usage: make prod-exec CMD="...")
+	@$(MAKE) exec ENV=prod CMD="$(CMD)"

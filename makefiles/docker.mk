@@ -46,15 +46,35 @@ logs: ## View container logs for current environment
 ps: ## List containers for current environment
 	$(DC) ps
 
-# Environment-specific shortcuts
-.PHONY: up-prod
-up-prod: ## Start production environment
+# Production environment shortcuts
+.PHONY: prod-up
+prod-up: ## Start production environment
 	@$(MAKE) up ENV=prod
 
-.PHONY: down-prod
-down-prod: ## Stop production environment
+.PHONY: prod-down
+prod-down: ## Stop production environment
 	@$(MAKE) down ENV=prod
 
-.PHONY: rebuild-prod
-rebuild-prod: ## Rebuild production environment
+.PHONY: prod-start
+prod-start: ## Start stopped production containers
+	@$(MAKE) start ENV=prod
+
+.PHONY: prod-stop
+prod-stop: ## Stop production containers
+	@$(MAKE) stop ENV=prod
+
+.PHONY: prod-restart
+prod-restart: ## Restart production containers
+	@$(MAKE) restart ENV=prod
+
+.PHONY: prod-rebuild
+prod-rebuild: ## Rebuild production environment
 	@$(MAKE) rebuild ENV=prod
+
+.PHONY: prod-logs
+prod-logs: ## View production container logs
+	@$(MAKE) logs ENV=prod
+
+.PHONY: prod-ps
+prod-ps: ## List production containers
+	@$(MAKE) ps ENV=prod

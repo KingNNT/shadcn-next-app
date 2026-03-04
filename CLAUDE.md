@@ -33,13 +33,25 @@ This is a Next.js 16 application with TypeScript, built with the App Router arch
 ### Docker Environment Commands
 
 ```bash
-# Container lifecycle (via Make)
-make up          # Start development containers (docker compose up -d)
-make down        # Stop and remove development containers
+# Container lifecycle — local (default)
+make up          # Start local containers (docker compose up -d)
+make down        # Stop and remove local containers
 make start       # Start stopped containers
 make stop        # Stop running containers
 make restart     # Restart containers (quick, no rebuild)
 make rebuild     # Rebuild images and restart containers
+make logs        # View container logs
+make ps          # List containers
+
+# Container lifecycle — production (prefix pattern)
+make prod-up       # Start production containers
+make prod-down     # Stop production containers
+make prod-start    # Start stopped production containers
+make prod-stop     # Stop production containers
+make prod-restart  # Restart production containers
+make prod-rebuild  # Rebuild production environment
+make prod-logs     # View production container logs
+make prod-ps       # List production containers
 
 # View all available commands
 make help        # Show all available Make commands
@@ -54,14 +66,20 @@ make help        # Show all available Make commands
 ### Application Commands (run in Docker container)
 
 ```bash
-# Development (all commands auto-start containers if needed)
+# Application — local (all commands auto-start containers if needed)
 make dev         # Start containers + Next.js dev server
 make shell       # Start containers + connect to bash shell
 make install     # Start containers + install/update dependencies
-
-# Code Quality (auto-starts containers)
 make lint        # Start containers + run Biome check
 make build       # Start containers + build production bundle
+make exec        # Execute a command (usage: make exec CMD="...")
+
+# Application — production (prefix pattern)
+make prod-shell    # Connect to production container shell
+make prod-build    # Build application in production
+make prod-lint     # Run linter in production
+make prod-install  # Install dependencies in production
+make prod-exec     # Execute command in production (usage: make prod-exec CMD="...")
 
 # Direct container execution (requires containers to be running)
 docker compose exec -it app yarn dev

@@ -33,6 +33,36 @@ exec: up ## Execute a command in the container (usage: make exec CMD="yarn add p
 	@printf "$(CYAN)Executing command: $(CMD)$(RESET)\n"
 	$(DC) exec -it app $(CMD)
 
+.PHONY: test
+test: ## Run all tests (unit + integration)
+	@printf "$(CYAN)Running tests...$(RESET)\n"
+	yarn test
+
+.PHONY: test-unit
+test-unit: ## Run unit tests only
+	@printf "$(CYAN)Running unit tests...$(RESET)\n"
+	yarn test:unit
+
+.PHONY: test-integration
+test-integration: ## Run integration tests only
+	@printf "$(CYAN)Running integration tests...$(RESET)\n"
+	yarn test:integration
+
+.PHONY: test-watch
+test-watch: ## Run tests in watch mode
+	@printf "$(CYAN)Starting test watch mode...$(RESET)\n"
+	yarn test:watch
+
+.PHONY: test-coverage
+test-coverage: ## Run tests with coverage report
+	@printf "$(CYAN)Running tests with coverage...$(RESET)\n"
+	yarn test:coverage
+
+.PHONY: test-e2e
+test-e2e: ## Run E2E tests (Playwright)
+	@printf "$(CYAN)Running E2E tests...$(RESET)\n"
+	yarn test:e2e
+
 # Production environment shortcuts
 .PHONY: prod-shell
 prod-shell: ## Connect to production container shell

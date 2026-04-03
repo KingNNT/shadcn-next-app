@@ -63,6 +63,17 @@ test-e2e: ## Run E2E tests (Playwright)
 	@printf "$(CYAN)Running E2E tests...$(RESET)\n"
 	yarn test:e2e
 
+.PHONY: storybook
+storybook: up ## Start containers and run Storybook dev server
+	@printf "$(CYAN)Starting Storybook...$(RESET)\n"
+	$(DC) exec -it app yarn storybook
+
+.PHONY: storybook-build
+storybook-build: up ## Start containers and build static Storybook
+	@printf "$(CYAN)Building Storybook...$(RESET)\n"
+	$(DC) exec -it app yarn storybook:build
+	@printf "$(GREEN)Storybook build completed$(RESET)\n"
+
 # Production environment shortcuts
 .PHONY: prod-shell
 prod-shell: ## Connect to production container shell

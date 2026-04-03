@@ -41,6 +41,6 @@ USER ${NAME_CONTAINER_USER}
 # Install dependencies during build
 RUN yarn install
 
-EXPOSE 3000
+EXPOSE 3000 6006
 
 CMD ["tail", "-f", "/dev/null"]

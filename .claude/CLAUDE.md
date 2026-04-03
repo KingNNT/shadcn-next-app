@@ -10,16 +10,17 @@ Next.js 16 application with TypeScript, App Router, `src/` directory structure, 
 
 ## Key Technologies
 
-- **Next.js 16.0.6** with App Router and TypeScript
-- **React 19.2.0** / **React DOM 19.2.0**
-- **Node.js 24.11.1 LTS** with **Yarn (stable)**
-- **TailwindCSS v4.1.17** / **shadcn/ui** (New York style, neutral base color)
+- **Next.js 16.2.1** with App Router and TypeScript
+- **React 19.2.4** / **React DOM 19.2.4**
+- **Node.js 24.12.0 LTS** with **Yarn 4.12.0 (stable)**
+- **TailwindCSS v4.2.2** / **shadcn/ui** (New York style, neutral base color)
 - **NextAuth.js v5.0.0-beta.30** (JWT-based, credentials provider)
 - **next-intl v4.x** for i18n (en, vi)
-- **React Hook Form v7.67.0** + **Zod v4.1.13**
-- **Zustand v5.0.9** for state management
-- **Biome v2.3.8** for linting/formatting
-- **ky v1.14.0** for HTTP client
+- **React Hook Form v7.72.0** + **Zod v4.3.6**
+- **Zustand v5.0.12** for state management
+- **Biome v2.4.9** for linting/formatting
+- **Storybook v8.6** with `@storybook/react-vite` for component development
+- **ky v1.14.3** for HTTP client
 - **Docker** for containerized development and production
 
 ## Common Commands
@@ -36,6 +37,10 @@ make install     # Install/update dependencies
 make lint        # Run Biome check
 make build       # Production build
 make exec CMD="..." # Run arbitrary command
+
+# Storybook
+make storybook       # Start Storybook dev server (port 6006)
+make storybook-build # Build static Storybook
 
 # Yarn scripts (inside container)
 yarn dev / yarn build / yarn start
@@ -73,6 +78,7 @@ src/
   libs/                   # Utilities (stores/, intl/, utils.ts)
   proxy.ts                # Middleware (locale detection + auth)
 .docker/                  # Dockerfiles (development, production)
+.storybook/               # Storybook config, decorators, mocks
 makefiles/                # Modular Makefile components
 ```
 
@@ -99,7 +105,7 @@ Add new protected routes to `PRIVATE_ROUTES` array — no middleware changes nee
 ## Docker
 
 - **Compose**: `docker-compose.yml` (base) + `docker-compose.override.yml` (local, auto-loaded) + `docker-compose.production.yml` (prod, `-f` flag)
-- **Port**: `3333:3000` (host:container)
+- **Ports**: `3333:3000` (Next.js), `6006:6006` (Storybook)
 - **Volume**: `.:/app` (bind mount for hot reload)
 - **Env files**: `.env` + `.env.local`
 

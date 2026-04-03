@@ -2,6 +2,8 @@
 paths:
   - "src/**/*.ts"
   - "src/**/*.tsx"
+  - ".storybook/**/*.ts"
+  - ".storybook/**/*.tsx"
 ---
 
 # Code Styles
@@ -14,7 +16,7 @@ paths:
 ## Formatting
 
 - Double quotes, tab indentation (see `biome.json`)
-- **Biome v2.3.8**: All-in-one linter and formatter
+- **Biome v2.4.9**: All-in-one linter and formatter
 - Use `import type` for type-only imports
 
 ## Naming
@@ -44,6 +46,7 @@ paths:
 - Enums: `kebab-case.enum.ts` — `locale.enum.ts`
 - Type definitions: `{name}.d.ts` in `src/types/`
 - Unit tests: co-located as `{name}.test.tsx` or `{name}.test.ts` (NOT `.spec.ts`)
+- Stories: co-located as `{name}.stories.tsx` — `button.stories.tsx`, `password-input.stories.tsx`
 - E2E tests: `{name}.spec.ts` in `e2e/`
 - Barrel exports (`index.ts`) for `apis/`, `exceptions/`, `services/`, `constants/`, `enums/`, `types/`, `i18n/`, `libs/stores/`
 - No barrel exports in `src/components/` — import components directly by path

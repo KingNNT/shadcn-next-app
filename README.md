@@ -5,12 +5,12 @@ A production-ready Next.js 16 application with TypeScript, internationalization,
 ## 🚀 Tech Stack
 
 ### Core Framework
-- **Next.js 16.0.6** - App Router with TypeScript 5.9
-- **React 19.2.0** - Latest React with Server Components
-- **Node.js 24.11.1 LTS** with **Yarn 4.12.0** for package management
+- **Next.js 16.2.1** - App Router with TypeScript 5.9
+- **React 19.2.4** - Latest React with Server Components
+- **Node.js 24.12.0 LTS** with **Yarn 4.12.0** for package management
 
 ### Styling & UI
-- **TailwindCSS v4.1.17** - Modern utility-first CSS with PostCSS
+- **TailwindCSS v4.2.2** - Modern utility-first CSS with PostCSS
 - **shadcn/ui** - Accessible and customizable component library (New York style)
 - **next-themes v0.4.6** - Dark/light mode theming
 - **Radix UI** - Accessible component primitives
@@ -18,22 +18,23 @@ A production-ready Next.js 16 application with TypeScript, internationalization,
 
 ### Authentication & API
 - **NextAuth.js v5.0.0-beta.30** - Secure authentication with JWT sessions
-- **ky v1.14.0** - HTTP client with retry logic and interceptors
+- **ky v1.14.3** - HTTP client with retry logic and interceptors
 
 ### Internationalization & State
-- **React Intl v7.1.14** - Full i18n support (English, Vietnamese)
-- **Zustand v5.0.9** - Lightweight state management
+- **next-intl v4.x** - Full i18n support (English, Vietnamese)
+- **Zustand v5.0.12** - Lightweight state management
 
 ### Forms & Validation
-- **React Hook Form v7.67.0** - Form state management
-- **Zod v4.1.13** - Type-safe schema validation
+- **React Hook Form v7.72.0** - Form state management
+- **Zod v4.3.6** - Type-safe schema validation
 - **@hookform/resolvers v5.2.2** - Zod integration
 
 ### Development & Quality
 - **Docker** - Complete containerization for dev and production
-- **Biome v2.3.8** - Fast linter and formatter
+- **Storybook v8.6** - Component development and documentation
+- **Biome v2.4.9** - Fast linter and formatter
 - **Husky v9.1.7** - Git hooks management
-- **lint-staged v16.2.7** - Pre-commit linting
+- **lint-staged v16.4.0** - Pre-commit linting
 - **commitlint v20** - Conventional commit enforcement
 - **gitleaks** - Secret detection tool
 
@@ -68,6 +69,7 @@ make dev
 ```
 
 **Access the application**: http://localhost:3333
+**Access Storybook**: http://localhost:6006
 
 ### Manual Setup
 
@@ -102,11 +104,18 @@ make up          # Start containers only
 make down        # Stop and remove containers
 make restart     # Quick restart (no rebuild)
 make rebuild     # Rebuild images + restart
+make storybook   # Start Storybook dev server (port 6006)
 ```
 
 ## 📁 Project Structure
 
 ```
+.storybook/                        # Storybook configuration
+├── decorators/                    # Global decorators (theme, intl, session)
+├── mocks/                         # Mock data (messages, sessions)
+├── main.ts                        # Storybook config (framework, addons)
+└── preview.ts                     # Global decorators and toolbar controls
+
 src/
 ├── app/
 │   ├── [locale]/              # Locale-based routing
@@ -175,7 +184,7 @@ src/
 │   ├── locale.enum.ts         # Locale enumeration (EN, VI)
 │   └── index.ts               # Enum exports
 │
-├── lang/
+├── langs/
 │   ├── en.json                # English translations
 │   └── vi.json                # Vietnamese translations
 │
@@ -189,7 +198,7 @@ src/
 - **Locale-based routing**: `/en/home`, `/vi/home`
 - **Automatic locale detection**: Browser preferences, cookies
 - **Persistent locale**: Saved in cookies for 1 year
-- **React Intl**: Full message formatting support
+- **next-intl**: Full message formatting support
 
 ### 🔐 Authentication & Authorization
 - **NextAuth.js v5**: Secure JWT-based sessions
@@ -230,6 +239,14 @@ export const PRIVATE_ROUTES = [
 - **State management**: Zustand stores for global state
 - **Middleware**: Handles auth + locale in `src/proxy.ts`
 - **Centralized config**: API settings, error codes, and constants in dedicated files
+
+### 📖 Storybook
+- **Component development**: Isolated development environment for UI components
+- **Dark mode toggle**: Toolbar control to switch between light/dark themes
+- **Locale switching**: Toolbar control to switch between en/vi locales
+- **Interaction testing**: Visual interaction tests with `@storybook/addon-interactions`
+- **Auto-generated docs**: `autodocs` tag generates documentation from component props
+- **Co-located stories**: Story files live next to their components (`button.stories.tsx`)
 
 ### 🐳 Docker & Development
 - **Containerized development**: Consistent environment for all developers
@@ -431,8 +448,8 @@ Services throw typed exceptions that map to HTTP status codes:
 ### Adding Translations
 
 Edit both language files:
-- `src/lang/en.json` - English translations
-- `src/lang/vi.json` - Vietnamese translations
+- `src/langs/en.json` - English translations
+- `src/langs/vi.json` - Vietnamese translations
 
 ```json
 {
@@ -452,6 +469,43 @@ yarn dlx shadcn@latest add [component-name]
 yarn dlx shadcn@latest add dialog
 ```
 
+### Adding Storybook Stories
+
+Create a story file co-located with the component:
+
+```tsx
+// src/components/ui/button.stories.tsx
+import type { Meta, StoryObj } from "@storybook/react";
+import { Button } from "./button";
+
+const meta: Meta<typeof Button> = {
+  title: "UI/Button",
+  component: Button,
+  tags: ["autodocs"],
+};
+
+export default meta;
+type Story = StoryObj<typeof meta>;
+
+export const Default: Story = {
+  args: { children: "Button" },
+};
+```
+
+For interaction testing, use `play` functions:
+
+```tsx
+import { expect, userEvent, within } from "@storybook/test";
+
+export const Interactive: Story = {
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    await userEvent.click(canvas.getByRole("button"));
+    await expect(canvas.getByRole("button")).toBeVisible();
+  },
+};
+```
+
 ### Project Organization
 
 - **Pages**: `src/app/[locale]/(unauthenticated|authenticated)/[page]/page.tsx`
@@ -468,7 +522,7 @@ yarn dlx shadcn@latest add dialog
 ## 📚 Documentation
 
 For detailed documentation, see:
-- [CLAUDE.md](CLAUDE.md) - Full project guide for Claude Code
+- [CLAUDE.md](.claude/CLAUDE.md) - Full project guide for Claude Code
 
 ## 🤝 Contributing
 
@@ -477,9 +531,10 @@ For detailed documentation, see:
 3. Security scanning runs automatically via gitleaks pre-commit hook
 4. Add translations for both EN and VI locales
 5. Test in both light and dark themes
-6. Follow the three-layer architecture pattern (API Client → Service → API Route)
-7. Use typed exceptions for error handling in services
-8. Ensure Docker build succeeds
+6. Add Storybook stories for new UI components
+7. Follow the three-layer architecture pattern (API Client → Service → API Route)
+8. Use typed exceptions for error handling in services
+9. Ensure Docker build succeeds
 
 ### Commit Format Examples
 ```bash
@@ -500,4 +555,4 @@ yarn precommit   # Run all checks (format + lint + scan)
 
 ## 📝 License
 
-© 2025 shadcn-next-app. All rights reserved.
+© 2025-2026 shadcn-next-app. All rights reserved.
